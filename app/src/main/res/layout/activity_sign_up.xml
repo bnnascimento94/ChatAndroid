@@ -8,7 +8,7 @@
     tools:context=".presentation.login.SignUpActivity">
 
 
-    <ImageView
+    <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/logo"
         android:layout_width="100dp"
         android:layout_height="100dp"
