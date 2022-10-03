@@ -13,6 +13,14 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent">
 
+        <de.hdodenhof.circleimageview.CircleImageView
+            android:id="@+id/userphoto"
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_margin="6dp"
+            android:layout_gravity="center_vertical"
+            android:src="@drawable/ic_baseline_account_circle_24"/>
+
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/received"
             android:layout_width="wrap_content"
@@ -25,14 +33,16 @@
             app:boxCornerRadiusTopEnd="16dp"
             app:boxCornerRadiusBottomEnd="16dp"
             app:boxCornerRadiusBottomStart="16dp">
-            <EditText
+            <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/txtReceived"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:focusable="false"
                 android:text=""
                 android:inputType="textMultiLine"/>
         </com.google.android.material.textfield.TextInputLayout>
+
+
 
     </LinearLayout>
 

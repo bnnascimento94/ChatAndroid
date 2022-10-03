@@ -1,16 +1,30 @@
-package com.example.chatandroid
+package com.example.chatandroid.presentation.chat
 
 import android.content.Context
 import android.text.InputType.TYPE_NULL
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.example.chatandroid.R
+import com.example.chatandroid.data.model.Message
+import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.auth.FirebaseAuth
 
-class MessageAdapter(val context:Context, val messageList:ArrayList<Message>):
+class MessageAdapter(val context:Context):
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+    var messageList: ArrayList<Message> = ArrayList()
+
+    public fun load(messageList:ArrayList<Message>){
+        this.messageList = messageList
+        this.notifyDataSetChanged()
+    }
+
 
     val ITEM_RECEIVED = 1
     val ITEM_SENT =2
@@ -18,11 +32,11 @@ class MessageAdapter(val context:Context, val messageList:ArrayList<Message>):
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         if(viewType == 1){
             //inflate received message
-            val view:View = LayoutInflater.from(context).inflate(R.layout.received_message,parent,false)
+            val view:View = LayoutInflater.from(parent.context).inflate(R.layout.received_message,parent,false)
             return ReceiveViewHolder(view)
         }else{
             //inflate sent
-            val view:View = LayoutInflater.from(context).inflate(R.layout.sent_message,parent,false)
+            val view:View = LayoutInflater.from(parent.context).inflate(R.layout.sent_message,parent,false)
             return SentViewHolder(view)
         }
     }
@@ -32,17 +46,24 @@ class MessageAdapter(val context:Context, val messageList:ArrayList<Message>):
         if(holder.javaClass == SentViewHolder::class.java){
             // do stuff for sent holder
             val viewHolder = holder as SentViewHolder
-            viewHolder.sentMessage.text = currentMessage.message
+            viewHolder.sentMessage.setText(currentMessage.message)
             viewHolder.sentMessage.isFocusableInTouchMode = false
             viewHolder.sentMessage.inputType = TYPE_NULL
         }else{
             // do stuff for receive holder
             val viewHolder = holder as ReceiveViewHolder
-            viewHolder.receivedMessage.text = currentMessage.message
+            if(currentMessage.photoUserSender != null){
+                    Glide
+                        .with(holder.imageView.context)
+                        .load(currentMessage.photoUserSender)
+                        .centerCrop()
+                        .placeholder(R.drawable.ic_baseline_account_circle_24)
+                        .into(holder.imageView);
+            }
+            viewHolder.receivedMessage.setText(currentMessage.message)
             viewHolder.receivedMessage.isFocusable = false
             viewHolder.receivedMessage.isFocusableInTouchMode = false
             viewHolder.receivedMessage.inputType = TYPE_NULL
-
         }
     }
 
@@ -60,13 +81,12 @@ class MessageAdapter(val context:Context, val messageList:ArrayList<Message>):
     }
 
     class SentViewHolder(itemView: View):RecyclerView.ViewHolder(itemView){
-        val sentMessage = itemView.findViewById<TextView>(R.id.txtSent)
-
+        val sentMessage: EditText = itemView.findViewById(R.id.txtSent)
     }
 
     class ReceiveViewHolder(itemView: View):RecyclerView.ViewHolder(itemView){
-        val receivedMessage = itemView.findViewById<TextView>(R.id.txtReceived)
-
+        val receivedMessage: EditText = itemView.findViewById(R.id.txtReceived)
+        val imageView = itemView.findViewById<ImageView>(R.id.userphoto)
     }
 
 
