@@ -47,6 +47,15 @@ class DatabaseRespositoryImpl(val mDbRef: DatabaseReference, val firebaseAuth: F
         return ref.downloadUrl.await().toString()
     }
 
+    private suspend fun deletePhoto(uid: String?){
+        try {
+            val storageRef = firebaseStorage.getReference()
+            val desertRef = storageRef.child("usuario/${uid!!}.jpg")
+            desertRef.delete().await()
+        }catch (exception: Exception){ }
+
+    }
+
     override suspend fun getListOfUsers(): Resource<List<User>>? {
         return try{
             val user = firebaseAuth.currentUser
@@ -82,6 +91,25 @@ class DatabaseRespositoryImpl(val mDbRef: DatabaseReference, val firebaseAuth: F
             if(user != null){
                 val photoName = saveUserPhoto(photo, user.uid)
                 mDbRef.child("user").child(user!!.uid).setValue(User(name, username, user.uid,photoName)).await()
+                Resource.Success(true)
+            }else{
+                Resource.Error("Não há usuários para inserir")
+            }
+        }catch(e: Exception){
+            Resource.Error(e.message)
+        }
+    }
+
+    override suspend fun updateUser(name: String, photo: Bitmap): Resource<Boolean>? {
+        return try {
+            val user = firebaseAuth.currentUser
+            if(user != null){
+                deletePhoto(user.uid)
+                val namePhoto: String? = saveUserPhoto(photo,user.uid)
+                val usuario = mutableMapOf<String, Any?>()
+                usuario.put("name",name)
+                usuario.put("photoName",namePhoto)
+                mDbRef.child("user").child(user!!.uid).updateChildren(usuario).await()
                 Resource.Success(true)
             }else{
                 Resource.Error("Não há usuários para inserir")
@@ -146,7 +174,7 @@ class DatabaseRespositoryImpl(val mDbRef: DatabaseReference, val firebaseAuth: F
                 for(postSnapshot in snapshot.children){
                     val message = postSnapshot.getValue(Message::class.java)
                     if (message != null) {
-                        if(message.senderId != receiverUid && userReceiver?.photoName != null){
+                        if(senderUID != receiverUid && userReceiver?.photoName != null){
                             message.photoUserSender = userReceiver.photoName
                         }
                         m.add(message)
@@ -160,7 +188,7 @@ class DatabaseRespositoryImpl(val mDbRef: DatabaseReference, val firebaseAuth: F
 
             override fun onCancelled(error: DatabaseError) {
                 Resource.Error(error.message.toString(), null)
-                close()
+                close(error.toException())
             }
 
         })

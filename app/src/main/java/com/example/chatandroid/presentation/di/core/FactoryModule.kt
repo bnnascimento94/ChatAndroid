@@ -5,11 +5,14 @@ import com.example.chatandroid.domain.usecases.chat.SendMessageUseCase
 import com.example.chatandroid.domain.usecases.login.LoginUsercase
 import com.example.chatandroid.domain.usecases.login.LogoutUseCase
 import com.example.chatandroid.domain.usecases.login.RegisterUseCase
+import com.example.chatandroid.domain.usecases.users.GetCurrentUserUseCase
 import com.example.chatandroid.domain.usecases.users.GetUsersUseCase
+import com.example.chatandroid.domain.usecases.users.UpdateUserUseCase
 import com.example.chatandroid.presentation.chat.ChatActivityViewModelFactory
 import com.example.chatandroid.presentation.users.MainActivityViewModelFactory
 import com.example.chatandroid.presentation.login.LoginViewModelFactory
 import com.example.chatandroid.presentation.login.SignUpViewModelFactory
+import com.example.chatandroid.presentation.profile.ProfileViewModelFactory
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -27,6 +30,15 @@ class FactoryModule {
         registerUsercase: RegisterUseCase
     ): SignUpViewModelFactory {
         return SignUpViewModelFactory(registerUsercase)
+    }
+
+    @Singleton
+    @Provides
+    fun profileViewModelFactory(
+        updateUserUseCase: UpdateUserUseCase,
+        getCurrentUserUseCase: GetCurrentUserUseCase
+    ): ProfileViewModelFactory {
+        return ProfileViewModelFactory(updateUserUseCase,getCurrentUserUseCase)
     }
 
     @Singleton

@@ -4,11 +4,12 @@ import com.example.chatandroid.domain.repository.DatabaseRepository
 import com.example.chatandroid.domain.repository.LoginRepository
 import com.example.chatandroid.domain.usecases.chat.ListMessageUseCase
 import com.example.chatandroid.domain.usecases.chat.SendMessageUseCase
-import com.example.chatandroid.domain.usecases.login.GetCurrentUserUseCase
+import com.example.chatandroid.domain.usecases.users.GetCurrentUserUseCase
 import com.example.chatandroid.domain.usecases.login.LoginUsercase
 import com.example.chatandroid.domain.usecases.login.LogoutUseCase
 import com.example.chatandroid.domain.usecases.login.RegisterUseCase
 import com.example.chatandroid.domain.usecases.users.GetUsersUseCase
+import com.example.chatandroid.domain.usecases.users.UpdateUserUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -28,8 +29,14 @@ class UseCaseModule {
 
     @Singleton
     @Provides
-    fun provideGetCurrentUserUseCase(loginRepository: LoginRepository): GetCurrentUserUseCase {
-        return GetCurrentUserUseCase(loginRepository)
+    fun provideGetCurrentUserUseCase(databaseRepository: DatabaseRepository): GetCurrentUserUseCase {
+        return GetCurrentUserUseCase(databaseRepository)
+    }
+
+    @Singleton
+    @Provides
+    fun provideUpdateUserUseCase(databaseRepository: DatabaseRepository): UpdateUserUseCase {
+        return UpdateUserUseCase(databaseRepository)
     }
 
 

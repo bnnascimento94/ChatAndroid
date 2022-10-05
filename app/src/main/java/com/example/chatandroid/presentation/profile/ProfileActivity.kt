@@ -1,4 +1,4 @@
-package com.example.chatandroid.presentation.login
+package com.example.chatandroid.presentation.profile
 
 import android.Manifest
 import android.app.Activity
@@ -10,11 +10,9 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
 import android.view.View
-import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.activity.result.contract.ActivityResultContracts.StartActivityForResult
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -23,13 +21,11 @@ import androidx.core.view.drawToBitmap
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.bumptech.glide.Glide
 import com.example.chatandroid.R
 import com.example.chatandroid.data.util.ImageSaver
 import com.example.chatandroid.data.util.Resource
-import com.example.chatandroid.databinding.ActivitySignUpBinding
-import com.example.chatandroid.presentation.users.MainActivity
-import com.google.android.material.button.MaterialButton
-import com.google.android.material.textfield.TextInputEditText
+import com.example.chatandroid.databinding.ActivityProfileBinding
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
 import java.io.IOException
@@ -37,21 +33,12 @@ import javax.inject.Inject
 
 
 @AndroidEntryPoint
-class SignUpActivity : AppCompatActivity() {
+class ProfileActivity : AppCompatActivity() {
+
     @Inject
-    lateinit var factory: SignUpViewModelFactory
-
-    lateinit var signUpViewModel: SignUpViewModel
-
-    lateinit var binding: ActivitySignUpBinding
-
-    private lateinit var progressBar: ProgressBar
-    private lateinit var editName: TextInputEditText
-    private lateinit var editEmail: TextInputEditText
-    private lateinit var editPassword: TextInputEditText
-    private lateinit var confirmPassword : TextInputEditText
-    private lateinit var btnSignUp: MaterialButton
-    private lateinit var btnAdicionar: MaterialButton
+    lateinit var factory: ProfileViewModelFactory
+    private lateinit var profileViewModel: ProfileViewModel
+    private lateinit var binding: ActivityProfileBinding
 
     companion object {
         private const val SOLICITAR_PERMISSAO = 1
@@ -60,7 +47,7 @@ class SignUpActivity : AppCompatActivity() {
     private var resultadoTirarFoto = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         if (result.resultCode == Activity.RESULT_OK) {
             try {
-                binding?.logo?.setImageBitmap(signUpViewModel?.rotacionarImagem())
+                binding?.logo?.setImageBitmap(profileViewModel?.rotacionarImagem())
             } catch (e: Exception) {
                 Toast.makeText(applicationContext, " $e", Toast.LENGTH_LONG)
             }
@@ -69,7 +56,7 @@ class SignUpActivity : AppCompatActivity() {
 
 
     var launchSomeActivity = registerForActivityResult(
-        StartActivityForResult()
+        ActivityResultContracts.StartActivityForResult()
     ) { result: ActivityResult ->
         if (result.resultCode
             == RESULT_OK
@@ -87,7 +74,7 @@ class SignUpActivity : AppCompatActivity() {
                         selectedImageUri
                     )
 
-                    signUpViewModel.filePhoto = File(selectedImageUri?.path)
+                    profileViewModel.filePhoto = File(selectedImageUri?.path)
                     binding?.logo?.setImageBitmap(selectedImageBitmap)
                 } catch (e: IOException) {
                     e.printStackTrace()
@@ -98,54 +85,55 @@ class SignUpActivity : AppCompatActivity() {
     }
 
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_sign_up)
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_profile)
+        profileViewModel = ViewModelProvider(this,factory).get(ProfileViewModel::class.java)
+        profileViewModel.getUser()
 
-        signUpViewModel = ViewModelProvider(this,factory).get(SignUpViewModel::class.java)
 
-
-        progressBar = binding.progress
-        editName = binding.txtName
-        editEmail = binding.txtLogin
-        editPassword = binding.txtSenha
-        confirmPassword = binding.txtConfirmarSenha
-        btnSignUp = binding.btnCadastrar
-        btnAdicionar = binding.btnAdicionar
-
-        signUpViewModel.registerUser.observe(this, Observer { resource ->
+        profileViewModel.getUser.observe(this, Observer { resource ->
             when(resource){
                 is Resource.Loading ->{
-                    progressBar.visibility = View.VISIBLE
+                    binding.progress.visibility = View.VISIBLE
                 }
                 is Resource.Error ->{
-                    progressBar.visibility = View.GONE
-                    Toast.makeText(this@SignUpActivity,resource.message.toString(), Toast.LENGTH_SHORT).show()
+                    binding.progress.visibility = View.GONE
+                    Toast.makeText(this@ProfileActivity,resource.message.toString(), Toast.LENGTH_SHORT).show()
                 }
                 is Resource.Success ->{
-                    progressBar.visibility = View.GONE
-                    startActivity(Intent(this@SignUpActivity, MainActivity::class.java))
+                    binding.progress.visibility = View.GONE
+                    val t = resource?.data?.name
+                    binding.txtName.setText(resource?.data?.name)
+                    if(resource.data?.photoName != null){
+                        Glide
+                            .with(binding.logo.context)
+                            .load(resource.data?.photoName)
+                            .centerCrop()
+                            .placeholder(R.drawable.ic_baseline_account_circle_24)
+                            .into(binding.logo)
+                    }
                 }
             }
         })
 
-        btnSignUp.setOnClickListener {
-            val email = editEmail.text.toString()
-            val password = editPassword.text.toString()
-            val name = editName.text.toString()
-
-            if(signUpViewModel.filePhoto == null){
-                Toast.makeText(this@SignUpActivity,"Selecione a Foto do Usuário", Toast.LENGTH_SHORT).show()
-            } else if(!name.isBlank() && !email.isBlank() && !password.isBlank() && (password.toString() == confirmPassword.text.toString())){
-                signUpViewModel.registerUser(name,email,password, binding.logo.drawToBitmap())
-            }else{
-                Toast.makeText(this@SignUpActivity,"Preencha os campos corretamente", Toast.LENGTH_SHORT).show()
+        profileViewModel.updateUser.observe(this, Observer { resource ->
+            when(resource){
+                is Resource.Loading ->{
+                    binding.progress.visibility = View.VISIBLE
+                }
+                is Resource.Error ->{
+                    binding.progress.visibility = View.GONE
+                    Toast.makeText(this@ProfileActivity,resource.message.toString(), Toast.LENGTH_SHORT).show()
+                }
+                is Resource.Success ->{
+                    binding.progress.visibility = View.GONE
+                    Toast.makeText(this@ProfileActivity,"Usuário atualizado", Toast.LENGTH_SHORT).show()
+                }
             }
-        }
+        })
 
-
-        btnAdicionar.setOnClickListener {
+        binding.btnCarregarFoto.setOnClickListener {
 
             val permissionCheck = ContextCompat.checkSelfPermission(
                 this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
@@ -175,7 +163,7 @@ class SignUpActivity : AppCompatActivity() {
                 builder.setTitle("Foto")
                 builder.setMessage("Como deseja selecionar a foto")
                 builder.setPositiveButton("Tirar foto"){
-                    dialog, which -> tirarFoto()
+                        dialog, which -> tirarFoto()
                 }
                 builder.setNegativeButton("Galeria"){
                         dialog, which -> buscarGaleria()
@@ -183,7 +171,21 @@ class SignUpActivity : AppCompatActivity() {
 
                 builder.show()
             }
+
         }
+
+        binding.btnAtualizar.setOnClickListener {
+            val name = binding.txtName.text.toString()
+
+            if(profileViewModel.filePhoto == null){
+                Toast.makeText(this@ProfileActivity,"Selecione a Foto do Usuário", Toast.LENGTH_SHORT).show()
+            } else if(!name.isBlank()){
+                profileViewModel.updateUser(name, binding.logo.drawToBitmap())
+            }else{
+                Toast.makeText(this@ProfileActivity,"Preencha os campos corretamente", Toast.LENGTH_SHORT).show()
+            }
+        }
+
     }
 
 
@@ -192,14 +194,14 @@ class SignUpActivity : AppCompatActivity() {
         val intent = Intent()
         intent.action = MediaStore.ACTION_IMAGE_CAPTURE
         try {
-            signUpViewModel?.filePhoto = ImageSaver.createImageFile(SignUpActivity@this)
+            profileViewModel?.filePhoto = ImageSaver.createImageFile(SignUpActivity@this)
         } catch (e: Exception) {
             e.printStackTrace()
         }
         intent.putExtra(
             MediaStore.EXTRA_OUTPUT, FileProvider.getUriForFile(
                 this,
-                this.packageName + ".provider", signUpViewModel?.filePhoto!!
+                this.packageName + ".provider", profileViewModel?.filePhoto!!
             )
         )
         resultadoTirarFoto.launch(intent)
@@ -211,6 +213,5 @@ class SignUpActivity : AppCompatActivity() {
         intent.action = Intent.ACTION_GET_CONTENT
         launchSomeActivity.launch(intent)
     }
-
 
 }

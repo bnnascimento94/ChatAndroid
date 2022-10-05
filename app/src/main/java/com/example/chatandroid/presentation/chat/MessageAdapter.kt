@@ -1,7 +1,9 @@
 package com.example.chatandroid.presentation.chat
 
 import android.content.Context
+import android.text.Editable
 import android.text.InputType.TYPE_NULL
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -49,6 +51,7 @@ class MessageAdapter(val context:Context):
             viewHolder.sentMessage.setText(currentMessage.message)
             viewHolder.sentMessage.isFocusableInTouchMode = false
             viewHolder.sentMessage.inputType = TYPE_NULL
+
         }else{
             // do stuff for receive holder
             val viewHolder = holder as ReceiveViewHolder
@@ -81,11 +84,12 @@ class MessageAdapter(val context:Context):
     }
 
     class SentViewHolder(itemView: View):RecyclerView.ViewHolder(itemView){
-        val sentMessage: EditText = itemView.findViewById(R.id.txtSent)
+        val sentMessage: TextView = itemView.findViewById(R.id.txtSent)
+
     }
 
     class ReceiveViewHolder(itemView: View):RecyclerView.ViewHolder(itemView){
-        val receivedMessage: EditText = itemView.findViewById(R.id.txtReceived)
+        val receivedMessage: TextView = itemView.findViewById(R.id.txtReceived)
         val imageView = itemView.findViewById<ImageView>(R.id.userphoto)
     }
 

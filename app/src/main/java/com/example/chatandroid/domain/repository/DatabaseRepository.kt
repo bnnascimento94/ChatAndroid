@@ -15,6 +15,8 @@ interface DatabaseRepository {
 
     suspend fun insertUser(name:String,username:String,password:String, photo: Bitmap): Resource<Boolean>?
 
+    suspend fun updateUser(name:String, photo: Bitmap): Resource<Boolean>?
+
     suspend fun insertMessage(receiverUid:String,message:String): Resource<Boolean>?
 
     suspend fun listMessages(receiverUid:String): Flow<Resource<List<Message>>>?

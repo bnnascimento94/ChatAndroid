@@ -18,6 +18,7 @@ import com.example.chatandroid.data.model.User
 import com.example.chatandroid.data.util.Resource
 import com.example.chatandroid.databinding.ActivityMainBinding
 import com.example.chatandroid.presentation.login.LoginActivity
+import com.example.chatandroid.presentation.profile.ProfileActivity
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -66,7 +67,6 @@ class MainActivity : AppCompatActivity() {
                 is Resource.Success ->{
                     progressBar.visibility = View.GONE
                     adapter.load(resource.data as ArrayList<User>)
-                    //startActivity(Intent(this@MainActivity, MainActivity::class.java))
                 }
             }
 
@@ -100,6 +100,8 @@ class MainActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if(item.itemId == R.id.logout){
             mainActivityViewModel.logoutUsuario()
+        }else if (item.itemId == R.id.profile){
+            startActivity(Intent(this@MainActivity, ProfileActivity::class.java))
         }
         return true
     }
