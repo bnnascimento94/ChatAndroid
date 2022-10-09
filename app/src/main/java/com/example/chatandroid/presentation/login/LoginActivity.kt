@@ -12,6 +12,8 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.chatandroid.R
 import com.example.chatandroid.data.util.Resource
 import com.example.chatandroid.databinding.ActivityLoginBinding
+import com.example.chatandroid.presentation.chat.chatList.ChatsActivity
+import com.example.chatandroid.presentation.chat.chatList.ChatsAdapter
 import com.example.chatandroid.presentation.users.MainActivity
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputEditText
@@ -69,7 +71,7 @@ class LoginActivity : AppCompatActivity() {
                 }
                 is Resource.Success ->{
                     progressBar.visibility = View.GONE
-                    startActivity(Intent(this@LoginActivity, MainActivity::class.java))
+                    startActivity(Intent(this@LoginActivity, ChatsActivity::class.java))
                 }
             }
 

@@ -2,6 +2,7 @@ package com.example.chatandroid.data.repository.database
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import com.example.chatandroid.data.model.Chat
 import com.example.chatandroid.data.model.Message
 import com.example.chatandroid.data.model.User
 import com.example.chatandroid.data.util.Resource
@@ -143,12 +144,59 @@ class DatabaseRespositoryImpl(val mDbRef: DatabaseReference, val firebaseAuth: F
             val senderRoom = receiverUid + senderUID
             val receiverRoom = senderUID + receiverUid
             val messageObject = Message(message,senderUID, null)
-
             mDbRef.child("chats").child(senderRoom!!).child("messages").push().setValue(messageObject).await()
             mDbRef.child("chats").child(receiverRoom!!).child("messages").push().setValue(messageObject).await()
 
+            val senderChat = mDbRef.child("chats").child(senderRoom!!).get().await().getValue(Chat::class.java)
+
+            if(senderChat!!.unreadMessages != null){
+                val messagesNotRead = senderChat.unreadMessages!! + 1
+                val value = mutableMapOf<String, Any?>()
+                value.put("unreadMessages",messagesNotRead)
+                mDbRef.child("chats").child(senderRoom!!).updateChildren(value).await()
+            }else{
+                val value = mutableMapOf<String, Any?>()
+                value.put("unreadMessages",0)
+                mDbRef.child("chats").child(senderRoom!!).updateChildren(value).await()
+            }
+
+
+
             Resource.Success(true)
         }catch(e: Exception){
+            Resource.Error(e.message)
+        }
+
+
+    }
+
+    override suspend fun listChats(): Resource<List<Chat>>? {
+        return try {
+            val senderUID = firebaseAuth.currentUser?.uid
+            val users = mDbRef.child("user").get().await()
+            if(users.exists()){
+                val u = ArrayList<Chat>()
+                for(postSnapshot in users.children){
+                    var userReceiver = postSnapshot.getValue(User::class.java)
+                    if(!userReceiver!!.uid.equals(senderUID)){
+                        val receiverRoom = senderUID + userReceiver!!.uid
+
+                        val chat = mDbRef.child("chats").child(receiverRoom!!).get().await().getValue(Chat::class.java)
+                        if(chat != null){
+                            if(userReceiver?.photoName != null){
+                                userReceiver.photoName = getUrlPhotoProfile(userReceiver!!.uid!!)
+                            }
+                            val chat = Chat(userReceiver?.name!!,userReceiver!!.uid!!, userReceiver.photoName, unreadMessages = chat.unreadMessages)
+                            u.add(chat)
+                        }
+                    }
+
+                }
+                Resource.Success(u)
+            }else{
+                Resource.Error("")
+            }
+        }catch (e:Exception){
             Resource.Error(e.message)
         }
 
@@ -159,12 +207,18 @@ class DatabaseRespositoryImpl(val mDbRef: DatabaseReference, val firebaseAuth: F
         // 2.- We create a reference to our data inside Firestore
         val senderUID = firebaseAuth.currentUser?.uid
         val senderRoom = receiverUid + senderUID
+        val receiverRoom = senderUID + receiverUid
         val eventDocument =  mDbRef.child("chats").child(senderRoom!!).child("messages")
         val receiver = mDbRef.child("user").child(receiverUid).get().await()
         var userReceiver = receiver.getValue(User::class.java)
         if(userReceiver?.photoName != null){
             userReceiver.photoName = getUrlPhotoProfile(receiverUid)
         }
+
+        val value = mutableMapOf<String, Any?>()
+        value.put("unreadMessages",0)
+        mDbRef.child("chats").child(senderRoom!!).updateChildren(value).await()
+        mDbRef.child("chats").child(receiverRoom!!).updateChildren(value).await()
 
         // 3.- We generate a subscription that is going to let us listen for changes with
         // .addSnapshotListener and then offer those values to the channel that will be collected in our viewmodel

@@ -2,6 +2,7 @@ package com.example.chatandroid.presentation.di.core
 
 import com.example.chatandroid.domain.repository.DatabaseRepository
 import com.example.chatandroid.domain.repository.LoginRepository
+import com.example.chatandroid.domain.usecases.chat.ListChatUserCase
 import com.example.chatandroid.domain.usecases.chat.ListMessageUseCase
 import com.example.chatandroid.domain.usecases.chat.SendMessageUseCase
 import com.example.chatandroid.domain.usecases.users.GetCurrentUserUseCase
@@ -62,6 +63,12 @@ class UseCaseModule {
     @Provides
     fun provideListMessageUseCase(databaseRepository: DatabaseRepository): ListMessageUseCase {
         return ListMessageUseCase(databaseRepository)
+    }
+
+    @Singleton
+    @Provides
+    fun provideListChatUseCase(databaseRepository: DatabaseRepository): ListChatUserCase {
+        return ListChatUserCase(databaseRepository)
     }
 
     @Singleton

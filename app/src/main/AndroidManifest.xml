@@ -17,11 +17,15 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ChatAndroid">
         <activity
+            android:name=".presentation.chat.chatList.ChatsActivity"
+            android:exported="false"
+            android:theme="@style/AppTheme.NoActionBar"  />
+        <activity
             android:name=".presentation.profile.ProfileActivity"
             android:exported="false"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".presentation.chat.ChatActivity"
+            android:name=".presentation.chat.messages.ChatActivity"
             android:exported="false"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity

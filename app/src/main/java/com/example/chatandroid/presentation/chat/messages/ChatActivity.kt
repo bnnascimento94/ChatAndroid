@@ -1,4 +1,4 @@
-package com.example.chatandroid.presentation.chat
+package com.example.chatandroid.presentation.chat.messages
 
 import android.os.Bundle
 import android.view.View
@@ -14,7 +14,6 @@ import com.example.chatandroid.R
 import com.example.chatandroid.data.model.Message
 import com.example.chatandroid.data.util.Resource
 import com.example.chatandroid.databinding.ActivityChatBinding
-import com.example.chatandroid.presentation.login.LoginViewModel
 import com.google.android.material.textfield.TextInputEditText
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject

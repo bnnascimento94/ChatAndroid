@@ -1,4 +1,4 @@
-package com.example.chatandroid.presentation.chat
+package com.example.chatandroid.presentation.chat.messages
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider

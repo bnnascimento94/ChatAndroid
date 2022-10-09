@@ -72,38 +72,8 @@ class MainActivity : AppCompatActivity() {
 
         })
 
-        mainActivityViewModel.logoutUser.observe(this, androidx.lifecycle.Observer { resource ->
-            when(resource){
-                is Resource.Loading ->{
-                    progressBar.visibility = View.VISIBLE
-                }
-                is Resource.Error ->{
-                    progressBar.visibility = View.GONE
-                    Toast.makeText(this@MainActivity,resource.message.toString(), Toast.LENGTH_SHORT).show()
-                }
-                is Resource.Success ->{
-                    progressBar.visibility = View.GONE
-                    val intent = Intent(this@MainActivity, LoginActivity::class.java)
-                    finish()
-                    startActivity(intent)
-                }
-            }
-        })
-
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.menu,menu)
-        return super.onCreateOptionsMenu(menu)
-    }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        if(item.itemId == R.id.logout){
-            mainActivityViewModel.logoutUsuario()
-        }else if (item.itemId == R.id.profile){
-            startActivity(Intent(this@MainActivity, ProfileActivity::class.java))
-        }
-        return true
-    }
 
 }

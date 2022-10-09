@@ -1,6 +1,7 @@
 package com.example.chatandroid.domain.repository
 
 import android.graphics.Bitmap
+import com.example.chatandroid.data.model.Chat
 import com.example.chatandroid.data.model.Message
 import com.example.chatandroid.data.model.User
 import com.example.chatandroid.data.util.Resource
@@ -18,6 +19,8 @@ interface DatabaseRepository {
     suspend fun updateUser(name:String, photo: Bitmap): Resource<Boolean>?
 
     suspend fun insertMessage(receiverUid:String,message:String): Resource<Boolean>?
+
+    suspend fun listChats(): Resource<List<Chat>>?
 
     suspend fun listMessages(receiverUid:String): Flow<Resource<List<Message>>>?
 }

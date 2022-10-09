@@ -1,20 +1,15 @@
-package com.example.chatandroid.presentation.chat
+package com.example.chatandroid.presentation.chat.messages
 
 import android.content.Context
-import android.text.Editable
-import android.text.InputType.TYPE_NULL
-import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.chatandroid.R
 import com.example.chatandroid.data.model.Message
-import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.auth.FirebaseAuth
 
 class MessageAdapter(val context:Context):
@@ -50,7 +45,7 @@ class MessageAdapter(val context:Context):
             val viewHolder = holder as SentViewHolder
             viewHolder.sentMessage.setText(currentMessage.message)
             viewHolder.sentMessage.isFocusableInTouchMode = false
-            viewHolder.sentMessage.inputType = TYPE_NULL
+            //viewHolder.sentMessage.inputType = TYPE_NULL
 
         }else{
             // do stuff for receive holder
@@ -66,7 +61,7 @@ class MessageAdapter(val context:Context):
             viewHolder.receivedMessage.setText(currentMessage.message)
             viewHolder.receivedMessage.isFocusable = false
             viewHolder.receivedMessage.isFocusableInTouchMode = false
-            viewHolder.receivedMessage.inputType = TYPE_NULL
+            //viewHolder.receivedMessage.inputType = TYPE_NULL
         }
     }
 

@@ -7,10 +7,13 @@
         <entry key="..\:/Users/bruno/AndroidStudioProjects/ChatAndroid/app/src/main/res/drawable/bubble_receive.xml" value="0.165" />
         <entry key="..\:/Users/bruno/AndroidStudioProjects/ChatAndroid/app/src/main/res/drawable/bubble_sent.xml" value="0.165" />
         <entry key="..\:/Users/bruno/AndroidStudioProjects/ChatAndroid/app/src/main/res/layout/activity_chat.xml" value="0.1" />
+        <entry key="..\:/Users/bruno/AndroidStudioProjects/ChatAndroid/app/src/main/res/layout/activity_chats.xml" value="0.25" />
         <entry key="..\:/Users/bruno/AndroidStudioProjects/ChatAndroid/app/src/main/res/layout/activity_login.xml" value="0.264" />
         <entry key="..\:/Users/bruno/AndroidStudioProjects/ChatAndroid/app/src/main/res/layout/activity_main.xml" value="0.176" />
         <entry key="..\:/Users/bruno/AndroidStudioProjects/ChatAndroid/app/src/main/res/layout/activity_profile.xml" value="0.234375" />
         <entry key="..\:/Users/bruno/AndroidStudioProjects/ChatAndroid/app/src/main/res/layout/activity_sign_up.xml" value="0.2359375" />
+        <entry key="..\:/Users/bruno/AndroidStudioProjects/ChatAndroid/app/src/main/res/layout/chat_layout.xml" value="0.4" />
+        <entry key="..\:/Users/bruno/AndroidStudioProjects/ChatAndroid/app/src/main/res/layout/circle_shape.xml" value="0.19479166666666667" />
         <entry key="..\:/Users/bruno/AndroidStudioProjects/ChatAndroid/app/src/main/res/layout/received_message.xml" value="0.25" />
         <entry key="..\:/Users/bruno/AndroidStudioProjects/ChatAndroid/app/src/main/res/layout/sent_message.xml" value="0.264" />
         <entry key="..\:/Users/bruno/AndroidStudioProjects/ChatAndroid/app/src/main/res/layout/user_layout.xml" value="0.264" />

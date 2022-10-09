@@ -3,6 +3,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
+    android:layout_marginRight="50dp"
     android:layout_height="wrap_content">
 
     <LinearLayout
@@ -16,17 +17,19 @@
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/userphoto"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="35dp"
+            android:layout_height="35dp"
             android:layout_marginTop="3dp"
             android:layout_marginRight="10dp"
             android:layout_marginBottom="10dp"
             android:layout_gravity="center_vertical"
             android:src="@drawable/ic_baseline_account_circle_24"/>
 
-            <LinearLayout
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:minHeight="50dp"
+                android:minWidth="70dp"
                 android:background="@drawable/bubble_receive"
                 android:layout_marginTop="3dp"
                 android:layout_marginLeft="3dp"
@@ -34,8 +37,8 @@
                 android:layout_marginBottom="10dp">
                 <TextView
                     android:id="@+id/txtReceived"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
                     android:lineSpacingExtra="2dp"
                     android:paddingRight="10dp"
                     android:paddingTop="4dp"
@@ -43,11 +46,18 @@
                     android:paddingBottom="10dp"
                     android:paddingEnd="10dp"
                     android:singleLine="false"
+                    android:textAlignment="textStart"
+                    android:justificationMode="inter_word"
                     android:inputType="textMultiLine"
+                    android:textStyle="bold"
                     android:text=""
-                    android:textSize="13.5dp" />
+                    android:textSize="13.5dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintLeft_toLeftOf="parent"
+                    app:layout_constraintRight_toRightOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"/>
 
-            </LinearLayout>
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
 
 

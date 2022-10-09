@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.chatandroid.R
 import com.example.chatandroid.data.model.User
-import com.example.chatandroid.presentation.chat.ChatActivity
+import com.example.chatandroid.presentation.chat.messages.ChatActivity
 
 class UserAdapter(val context: Context): RecyclerView.Adapter<UserAdapter.UserViewHolder>() {
 
