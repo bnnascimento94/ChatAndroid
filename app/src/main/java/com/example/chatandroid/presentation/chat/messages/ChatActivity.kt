@@ -1,21 +1,39 @@
 package com.example.chatandroid.presentation.chat.messages
 
+import android.Manifest
+import android.app.Activity
+import android.app.AlertDialog
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Bundle
+import android.provider.MediaStore
 import android.view.View
 import android.widget.ImageButton
 import android.widget.Toast
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.chatandroid.R
 import com.example.chatandroid.data.model.Message
+import com.example.chatandroid.data.util.ImageSaver
 import com.example.chatandroid.data.util.Resource
 import com.example.chatandroid.databinding.ActivityChatBinding
+import com.example.chatandroid.presentation.profile.ProfileActivity
+import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import dagger.hilt.android.AndroidEntryPoint
+import java.io.File
+import java.io.IOException
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -31,9 +49,52 @@ class ChatActivity : AppCompatActivity() {
 
     lateinit var binding: ActivityChatBinding
 
+    lateinit var callback: BottomChooseFileFragment.Callback
+
     private lateinit var messageRecyclerView: RecyclerView
     private lateinit var messageBox: TextInputEditText
     private lateinit var sendMessage: ImageButton
+    private lateinit var receiverUid: String
+
+    companion object {
+        private const val SOLICITAR_PERMISSAO = 1
+    }
+
+    private var resultadoTirarFoto = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            try {
+                chatActivityViewModel.sendPhotoMessage(receiverUid,chatActivityViewModel.rotacionarImagem())
+            } catch (e: Exception) {
+                Toast.makeText(applicationContext, " $e", Toast.LENGTH_LONG)
+            }
+        }
+    }
+
+
+    var launchSomeActivity = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result: ActivityResult ->
+        if (result.resultCode == RESULT_OK) {
+            val data = result.data
+            // do your operation from here....
+            if (data != null
+                && data.data != null
+            ) {
+                val selectedImageUri: Uri? = data.data
+                val selectedImageBitmap: Bitmap
+                try {
+                    selectedImageBitmap = MediaStore.Images.Media.getBitmap(
+                        this.contentResolver,
+                        selectedImageUri
+                    )
+                    chatActivityViewModel.sendPhotoMessage(receiverUid,selectedImageBitmap)
+                } catch (e: IOException) {
+                    e.printStackTrace()
+                }
+
+            }
+        }
+    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,7 +103,7 @@ class ChatActivity : AppCompatActivity() {
         chatActivityViewModel = ViewModelProvider(this,factory).get(ChatActivityViewModel::class.java)
 
         val name = intent.getStringExtra("name")
-        val receiverUid = intent.getStringExtra("uid")
+        receiverUid = intent.getStringExtra("uid").toString()
 
         val toolbar: Toolbar = binding.toolbar
         setSupportActionBar(toolbar!!)
@@ -68,8 +129,13 @@ class ChatActivity : AppCompatActivity() {
                 }
                 is Resource.Success ->{
                     binding.progress.visibility = View.GONE
-                    adapter.load(resource.data as ArrayList<Message>)
-                    messageRecyclerView.smoothScrollToPosition(resource.data.size -1)
+                    resource.data?.let {
+                        if (it.isNotEmpty()){
+                            adapter.load(it as ArrayList<Message>,name)
+                        }
+                    }
+
+                    messageRecyclerView.smoothScrollToPosition(resource.data?.size!! -1)
                 }
             }
 
@@ -84,5 +150,81 @@ class ChatActivity : AppCompatActivity() {
             }
 
         }
+
+        binding.btnSendFile.setOnClickListener {
+            val bottomChooseFileFragment = BottomChooseFileFragment(object: BottomChooseFileFragment.Callback{
+                override fun onFile() {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onFoto() {
+                    val permissionCheck = ContextCompat.checkSelfPermission(applicationContext, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    val checkCameraPermission = ContextCompat.checkSelfPermission(this@ChatActivity, Manifest.permission.CAMERA)
+                    val permissionRead = ContextCompat.checkSelfPermission(this@ChatActivity, Manifest.permission.READ_EXTERNAL_STORAGE)
+                    if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(
+                            this@ChatActivity, arrayOf(
+                                Manifest.permission.WRITE_EXTERNAL_STORAGE
+                            ), SOLICITAR_PERMISSAO
+                        )
+                    } else if (checkCameraPermission != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(
+                            this@ChatActivity, arrayOf(
+                                Manifest.permission.CAMERA
+                            ), SOLICITAR_PERMISSAO
+                        )
+                    } else if (permissionRead != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(
+                            this@ChatActivity, arrayOf(
+                                Manifest.permission.READ_EXTERNAL_STORAGE
+                            ), SOLICITAR_PERMISSAO
+                        )
+                    } else {
+                        val builder = AlertDialog.Builder(this@ChatActivity)
+                        builder.setTitle("Foto")
+                        builder.setMessage("Como deseja selecionar a foto")
+                        builder.setPositiveButton("Tirar foto"){
+                                dialog, which -> tirarFoto()
+                        }
+                        builder.setNegativeButton("Galeria"){
+                                dialog, which -> buscarGaleria()
+                        }
+
+                        builder.show()
+                    }
+                }
+
+
+            })
+
+            bottomChooseFileFragment.show(supportFragmentManager, "tag")
+        }
+
+
+
+    }
+
+    private fun tirarFoto(){
+        val intent = Intent()
+        intent.action = MediaStore.ACTION_IMAGE_CAPTURE
+        try {
+            chatActivityViewModel?.filePhoto = ImageSaver.createImageFile(ChatActivity@this)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        intent.putExtra(
+            MediaStore.EXTRA_OUTPUT, FileProvider.getUriForFile(
+                this,
+                this.packageName + ".provider", chatActivityViewModel?.filePhoto!!
+            )
+        )
+        resultadoTirarFoto.launch(intent)
+    }
+
+    private fun buscarGaleria(){
+        val intent = Intent()
+        intent.setType("image/*")
+        intent.action = Intent.ACTION_GET_CONTENT
+        launchSomeActivity.launch(intent)
     }
 }

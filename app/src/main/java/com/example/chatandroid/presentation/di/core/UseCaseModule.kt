@@ -4,6 +4,7 @@ import com.example.chatandroid.domain.repository.DatabaseRepository
 import com.example.chatandroid.domain.repository.LoginRepository
 import com.example.chatandroid.domain.usecases.chat.ListChatUserCase
 import com.example.chatandroid.domain.usecases.chat.ListMessageUseCase
+import com.example.chatandroid.domain.usecases.chat.SendImageUseCase
 import com.example.chatandroid.domain.usecases.chat.SendMessageUseCase
 import com.example.chatandroid.domain.usecases.users.GetCurrentUserUseCase
 import com.example.chatandroid.domain.usecases.login.LoginUsercase
@@ -43,8 +44,8 @@ class UseCaseModule {
 
     @Singleton
     @Provides
-    fun provideLoginUserUseCase(loginRepository: LoginRepository): LoginUsercase {
-        return LoginUsercase(loginRepository)
+    fun provideLoginUserUseCase(loginRepository: LoginRepository, databaseRepository: DatabaseRepository): LoginUsercase {
+        return LoginUsercase(loginRepository, databaseRepository)
     }
 
     @Singleton
@@ -75,6 +76,12 @@ class UseCaseModule {
     @Provides
     fun provideSendMessageUseCase(databaseRepository: DatabaseRepository): SendMessageUseCase {
         return SendMessageUseCase(databaseRepository)
+    }
+
+    @Singleton
+    @Provides
+    fun provideSendImageUseCase(databaseRepository: DatabaseRepository): SendImageUseCase {
+        return SendImageUseCase(databaseRepository)
     }
 
 }

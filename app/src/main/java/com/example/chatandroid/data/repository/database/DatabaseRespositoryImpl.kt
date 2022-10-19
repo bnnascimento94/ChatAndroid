@@ -1,7 +1,6 @@
 package com.example.chatandroid.data.repository.database
 
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import com.example.chatandroid.data.model.Chat
 import com.example.chatandroid.data.model.Message
 import com.example.chatandroid.data.model.User
@@ -16,10 +15,9 @@ import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
 import java.io.ByteArrayOutputStream
-import java.io.File
-import java.io.FileInputStream
 
 class DatabaseRespositoryImpl(val mDbRef: DatabaseReference, val firebaseAuth: FirebaseAuth,val firebaseStorage: FirebaseStorage): DatabaseRepository {
 
@@ -30,7 +28,7 @@ class DatabaseRespositoryImpl(val mDbRef: DatabaseReference, val firebaseAuth: F
             if(user != null){
               val user =  mDbRef.child("user").child(user!!.uid).get().await().getValue(User::class.java)
               if(user?.photoName != null){
-                  user!!.photoName = getUrlPhotoProfile(user!!.uid!!)
+                  user!!.photoName = searchFotoUrl(user.photoName!!)
               }
               Resource.Success(user!!)
             }else{
@@ -42,11 +40,8 @@ class DatabaseRespositoryImpl(val mDbRef: DatabaseReference, val firebaseAuth: F
         }
     }
 
-    private suspend fun getUrlPhotoProfile(uid: String): String{
-        val storageRef = firebaseStorage.getReference()
-        val ref = storageRef.child("usuario/${uid!!}.jpg")
-        return ref.downloadUrl.await().toString()
-    }
+
+
 
     private suspend fun deletePhoto(uid: String?){
         try {
@@ -67,7 +62,7 @@ class DatabaseRespositoryImpl(val mDbRef: DatabaseReference, val firebaseAuth: F
                     val currentuser = postSnapshot.getValue(User::class.java)
                     if(!currentuser?.uid.equals(user?.uid)){
                         if(currentuser!!.photoName != null){
-                            currentuser!!.photoName = getUrlPhotoProfile(currentuser.uid!!)
+                            currentuser!!.photoName = searchFotoUrl(currentuser!!.photoName!!)
                         }
                         u.add(currentuser!!)
                     }
@@ -97,6 +92,22 @@ class DatabaseRespositoryImpl(val mDbRef: DatabaseReference, val firebaseAuth: F
                 Resource.Error("Não há usuários para inserir")
             }
         }catch(e: Exception){
+            Resource.Error(e.message)
+        }
+    }
+
+    override suspend fun updateToken(token: String?): Resource<Boolean>? {
+        return try {
+            val user = firebaseAuth.currentUser
+            if(user != null){
+                val usuario = mutableMapOf<String, Any?>()
+                usuario.put("token",token)
+                mDbRef.child("user").child(user!!.uid).updateChildren(usuario).await()
+                Resource.Success(true)
+            }else{
+                Resource.Error("Não há usuários para inserir o token")
+            }
+        }catch (e:Exception){
             Resource.Error(e.message)
         }
     }
@@ -135,6 +146,21 @@ class DatabaseRespositoryImpl(val mDbRef: DatabaseReference, val firebaseAuth: F
         }
     }
 
+    private suspend fun saveMessagePhoto(bitmap: Bitmap, photoName:String): String?{
+        val storageRef = firebaseStorage.getReference()
+        val mountainImagesRef = storageRef.child("messages/$photoName.jpg")
+        val baos = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos)
+        val data = baos.toByteArray()
+        var uploadTask = mountainImagesRef.putBytes(data).await()
+
+        if(uploadTask.bytesTransferred > 0){
+            return "messages/$photoName.jpg"
+        }else{
+            return null
+        }
+    }
+
     override suspend fun insertMessage(
         receiverUid:String,
         message: String
@@ -143,7 +169,7 @@ class DatabaseRespositoryImpl(val mDbRef: DatabaseReference, val firebaseAuth: F
             val senderUID = firebaseAuth.currentUser?.uid
             val senderRoom = receiverUid + senderUID
             val receiverRoom = senderUID + receiverUid
-            val messageObject = Message(message,senderUID, null)
+            val messageObject = Message(message,senderUID, null,null)
             mDbRef.child("chats").child(senderRoom!!).child("messages").push().setValue(messageObject).await()
             mDbRef.child("chats").child(receiverRoom!!).child("messages").push().setValue(messageObject).await()
 
@@ -153,11 +179,11 @@ class DatabaseRespositoryImpl(val mDbRef: DatabaseReference, val firebaseAuth: F
                 val messagesNotRead = senderChat.unreadMessages!! + 1
                 val value = mutableMapOf<String, Any?>()
                 value.put("unreadMessages",messagesNotRead)
-                mDbRef.child("chats").child(senderRoom!!).updateChildren(value).await()
+              //  mDbRef.child("chats").child(senderRoom!!).updateChildren(value).await()
             }else{
                 val value = mutableMapOf<String, Any?>()
                 value.put("unreadMessages",0)
-                mDbRef.child("chats").child(senderRoom!!).updateChildren(value).await()
+               // mDbRef.child("chats").child(senderRoom!!).setValue(value).await()
             }
 
 
@@ -170,6 +196,42 @@ class DatabaseRespositoryImpl(val mDbRef: DatabaseReference, val firebaseAuth: F
 
     }
 
+    override suspend fun insertFotoMessage(receiverUid: String, photo: Bitmap): Resource<Boolean>? {
+        return try {
+            val senderUID = firebaseAuth.currentUser?.uid
+            val senderRoom = receiverUid + senderUID
+            val receiverRoom = senderUID + receiverUid
+
+
+            val photoName:String = "PHOTO_"+System.currentTimeMillis()
+            val namePhoto: String? = saveMessagePhoto(photo,photoName)
+
+            val messageObject = Message(null,senderUID, null,namePhoto)
+
+            mDbRef.child("chats").child(senderRoom).child("messages").push().setValue(messageObject).await()
+            mDbRef.child("chats").child(receiverRoom).child("messages").push().setValue(messageObject).await()
+
+            /**
+            val senderChat = mDbRef.child("chats").child(senderRoom).get().await().getValue(Chat::class.java)
+            if(senderChat!!.unreadMessages != null){
+                val messagesNotRead = senderChat.unreadMessages!! + 1
+                val value = mutableMapOf<String, Any?>()
+                value.put("unreadMessages",messagesNotRead)
+                mDbRef.child("chats").child(senderRoom!!).updateChildren(value).await()
+            }else{
+                val value = mutableMapOf<String, Any?>()
+                value.put("unreadMessages",0)
+                mDbRef.child("chats").child(senderRoom!!).setValue(value).await()
+            } **/
+
+
+
+            Resource.Success(true)
+        }catch(e: Exception){
+            Resource.Error(e.message)
+        }
+    }
+
     override suspend fun listChats(): Resource<List<Chat>>? {
         return try {
             val senderUID = firebaseAuth.currentUser?.uid
@@ -179,14 +241,14 @@ class DatabaseRespositoryImpl(val mDbRef: DatabaseReference, val firebaseAuth: F
                 for(postSnapshot in users.children){
                     var userReceiver = postSnapshot.getValue(User::class.java)
                     if(!userReceiver!!.uid.equals(senderUID)){
-                        val receiverRoom = senderUID + userReceiver!!.uid
+                        val receiverRoom = senderUID + userReceiver.uid
 
-                        val chat = mDbRef.child("chats").child(receiverRoom!!).get().await().getValue(Chat::class.java)
+                        val chat = mDbRef.child("chats").child(receiverRoom).get().await().getValue(Chat::class.java)
                         if(chat != null){
-                            if(userReceiver?.photoName != null){
-                                userReceiver.photoName = getUrlPhotoProfile(userReceiver!!.uid!!)
+                            if(userReceiver.photoName != null){
+                                userReceiver.photoName = searchFotoUrl(userReceiver.photoName!!)
                             }
-                            val chat = Chat(userReceiver?.name!!,userReceiver!!.uid!!, userReceiver.photoName, unreadMessages = chat.unreadMessages)
+                            val chat = Chat(userReceiver.name!!,userReceiver.uid!!, userReceiver.photoName, unreadMessages = chat.unreadMessages)
                             u.add(chat)
                         }
                     }
@@ -212,13 +274,12 @@ class DatabaseRespositoryImpl(val mDbRef: DatabaseReference, val firebaseAuth: F
         val receiver = mDbRef.child("user").child(receiverUid).get().await()
         var userReceiver = receiver.getValue(User::class.java)
         if(userReceiver?.photoName != null){
-            userReceiver.photoName = getUrlPhotoProfile(receiverUid)
+            userReceiver.photoName = searchFotoUrl(userReceiver.photoName!!)
         }
 
-        val value = mutableMapOf<String, Any?>()
-        value.put("unreadMessages",0)
-        mDbRef.child("chats").child(senderRoom!!).updateChildren(value).await()
-        mDbRef.child("chats").child(receiverRoom!!).updateChildren(value).await()
+        //val value = mutableMapOf<String, Any?>()
+       // value.put("unreadMessages",0)
+       // mDbRef.child("chats").child(receiverRoom!!).updateChildren(value).await()
 
         // 3.- We generate a subscription that is going to let us listen for changes with
         // .addSnapshotListener and then offer those values to the channel that will be collected in our viewmodel
@@ -228,29 +289,42 @@ class DatabaseRespositoryImpl(val mDbRef: DatabaseReference, val firebaseAuth: F
                 for(postSnapshot in snapshot.children){
                     val message = postSnapshot.getValue(Message::class.java)
                     if (message != null) {
-                        if(senderUID != receiverUid && userReceiver?.photoName != null){
-                            message.photoUserSender = userReceiver.photoName
+                        message?.senderId?.let {
+                            if(senderUID != receiverUid && userReceiver?.photoName != null){
+                                message.photoUserSender = userReceiver.photoName
+                            }
+                            m.add(message)
                         }
-                        m.add(message)
                     }
                 }
-                offer(Resource.Success(m))
+                trySend(Resource.Success(m))
                // close()
 
             }
 
 
             override fun onCancelled(error: DatabaseError) {
-                Resource.Error(error.message.toString(), null)
-                close(error.toException())
+                trySend(Resource.Error(error.message.toString(), null))
             }
+
+
 
         })
 
+         //mDbRef.addValueEventListener(subscription)
 
 
         //Finally if collect is not in use or collecting any data we cancel this channel to prevent any leak and remove the subscription listener to the database
-        awaitClose()
 
+        awaitClose {
+            mDbRef.removeEventListener(subscription)
+        }
+
+    }
+
+    override suspend fun searchFotoUrl(path: String): String {
+        val storageRef = firebaseStorage.getReference()
+        val ref = storageRef.child(path)
+        return ref.downloadUrl.await().toString()
     }
 }

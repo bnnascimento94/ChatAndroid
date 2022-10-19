@@ -16,11 +16,17 @@ interface DatabaseRepository {
 
     suspend fun insertUser(name:String,username:String,password:String, photo: Bitmap): Resource<Boolean>?
 
+    suspend fun updateToken(token : String?): Resource<Boolean>?
+
     suspend fun updateUser(name:String, photo: Bitmap): Resource<Boolean>?
 
     suspend fun insertMessage(receiverUid:String,message:String): Resource<Boolean>?
 
+    suspend fun insertFotoMessage(receiverUid:String,photo:Bitmap): Resource<Boolean>?
+
     suspend fun listChats(): Resource<List<Chat>>?
 
     suspend fun listMessages(receiverUid:String): Flow<Resource<List<Message>>>?
+
+    suspend fun searchFotoUrl(path: String): String
 }

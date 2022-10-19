@@ -2,6 +2,7 @@ package com.example.chatandroid.presentation.di.core
 
 import com.example.chatandroid.domain.usecases.chat.ListChatUserCase
 import com.example.chatandroid.domain.usecases.chat.ListMessageUseCase
+import com.example.chatandroid.domain.usecases.chat.SendImageUseCase
 import com.example.chatandroid.domain.usecases.chat.SendMessageUseCase
 import com.example.chatandroid.domain.usecases.login.LoginUsercase
 import com.example.chatandroid.domain.usecases.login.LogoutUseCase
@@ -64,9 +65,10 @@ class FactoryModule {
     @Provides
     fun chatActivityViewModelFactory(
         listMessageUseCase: ListMessageUseCase,
-        sendMessageUseCase: SendMessageUseCase
+        sendMessageUseCase: SendMessageUseCase,
+        sendImageUseCase: SendImageUseCase
     ): ChatActivityViewModelFactory {
-        return ChatActivityViewModelFactory(listMessageUseCase, sendMessageUseCase)
+        return ChatActivityViewModelFactory(listMessageUseCase, sendMessageUseCase, sendImageUseCase)
     }
 
     @Singleton
