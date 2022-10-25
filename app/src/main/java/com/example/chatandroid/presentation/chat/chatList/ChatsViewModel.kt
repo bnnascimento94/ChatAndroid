@@ -19,7 +19,7 @@ class ChatsViewModel(private val listChatUserCase: ListChatUserCase, private val
     val logoutUser: LiveData<Resource<Boolean>> = _logoutUser
 
     fun getChatsList() = viewModelScope.launch{
-        Resource.Loading(true)
+        _chatList.postValue(Resource.Loading())
         _chatList.postValue(listChatUserCase.execute())
     }
 

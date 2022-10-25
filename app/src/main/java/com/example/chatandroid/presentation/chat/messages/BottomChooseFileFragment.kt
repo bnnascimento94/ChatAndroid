@@ -20,8 +20,8 @@ class BottomChooseFileFragment(callback: Callback) : BottomSheetDialogFragment()
 
 
     interface Callback {
-        fun onFile()
-        fun onFoto()
+        fun onCamera()
+        fun onGaleria()
     }
 
     override fun onCreateView(
@@ -32,17 +32,17 @@ class BottomChooseFileFragment(callback: Callback) : BottomSheetDialogFragment()
         super.onCreateView(inflater, container, savedInstanceState)
         val view: View = inflater.inflate(R.layout.bottom_choose_file, container, false)
 
-        val btnArquivo: MaterialButton = view.findViewById(R.id.btnArquivo)
-        val btnFoto: MaterialButton = view.findViewById(R.id.btnFoto)
+        val btnCamera: MaterialButton = view.findViewById(R.id.btnCamera)
+        val btnGaleria: MaterialButton = view.findViewById(R.id.btnGaleria)
 
 
-        btnArquivo.setOnClickListener {
-            callback?.onFile()
+        btnCamera.setOnClickListener {
+            callback?.onCamera()
             dismiss()
         }
 
-        btnFoto.setOnClickListener {
-            callback?.onFoto()
+        btnGaleria.setOnClickListener {
+            callback?.onGaleria()
             dismiss()
         }
 

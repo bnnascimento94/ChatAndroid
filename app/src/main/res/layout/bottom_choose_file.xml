@@ -43,25 +43,25 @@
 
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnArquivo"
+            android:id="@+id/btnCamera"
             android:layout_weight="1"
             android:backgroundTint="@android:color/transparent"
             android:textColor="@color/black"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
-            android:text="Arquivo"/>
+            android:text="Camera"/>
 
 
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnFoto"
+            android:id="@+id/btnGaleria"
             android:layout_weight="1"
             android:backgroundTint="@android:color/transparent"
             android:textColor="@color/black"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_margin="10dp"
-            android:text="Foto"/>
+            android:text="Galeria"/>
 
     </LinearLayout>
 

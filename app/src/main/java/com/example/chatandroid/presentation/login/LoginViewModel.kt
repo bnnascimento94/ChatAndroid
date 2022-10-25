@@ -14,6 +14,7 @@ class LoginViewModel(private val loginUsercase: LoginUsercase) : ViewModel(){
     val loginUser: LiveData<Resource<Boolean>> = _loginUser
 
     fun logarUsuario(email:String, password: String) = viewModelScope.launch {
+        _loginUser.postValue(Resource.Loading())
         _loginUser.postValue(loginUsercase.execute(email,password))
     }
 

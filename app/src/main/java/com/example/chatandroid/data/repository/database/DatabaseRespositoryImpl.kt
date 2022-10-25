@@ -18,6 +18,10 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
 import java.io.ByteArrayOutputStream
+import java.time.Instant
+import java.time.format.DateTimeFormatter
+import java.util.*
+import kotlin.collections.ArrayList
 
 class DatabaseRespositoryImpl(val mDbRef: DatabaseReference, val firebaseAuth: FirebaseAuth,val firebaseStorage: FirebaseStorage): DatabaseRepository {
 
@@ -169,7 +173,8 @@ class DatabaseRespositoryImpl(val mDbRef: DatabaseReference, val firebaseAuth: F
             val senderUID = firebaseAuth.currentUser?.uid
             val senderRoom = receiverUid + senderUID
             val receiverRoom = senderUID + receiverUid
-            val messageObject = Message(message,senderUID, null,null)
+            val data = Date().time
+            val messageObject = Message(null,message,senderUID, null,null, data)
             mDbRef.child("chats").child(senderRoom!!).child("messages").push().setValue(messageObject).await()
             mDbRef.child("chats").child(receiverRoom!!).child("messages").push().setValue(messageObject).await()
 
@@ -201,12 +206,13 @@ class DatabaseRespositoryImpl(val mDbRef: DatabaseReference, val firebaseAuth: F
             val senderUID = firebaseAuth.currentUser?.uid
             val senderRoom = receiverUid + senderUID
             val receiverRoom = senderUID + receiverUid
+            val data = Date().time
 
 
             val photoName:String = "PHOTO_"+System.currentTimeMillis()
             val namePhoto: String? = saveMessagePhoto(photo,photoName)
 
-            val messageObject = Message(null,senderUID, null,namePhoto)
+            val messageObject = Message(null,null,senderUID, null,namePhoto, data)
 
             mDbRef.child("chats").child(senderRoom).child("messages").push().setValue(messageObject).await()
             mDbRef.child("chats").child(receiverRoom).child("messages").push().setValue(messageObject).await()

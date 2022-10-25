@@ -28,11 +28,8 @@ import com.example.chatandroid.data.model.Message
 import com.example.chatandroid.data.util.ImageSaver
 import com.example.chatandroid.data.util.Resource
 import com.example.chatandroid.databinding.ActivityChatBinding
-import com.example.chatandroid.presentation.profile.ProfileActivity
-import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import dagger.hilt.android.AndroidEntryPoint
-import java.io.File
 import java.io.IOException
 import javax.inject.Inject
 
@@ -71,7 +68,7 @@ class ChatActivity : AppCompatActivity() {
     }
 
 
-    var launchSomeActivity = registerForActivityResult(
+    var launchGaleriaFoto = registerForActivityResult(
         ActivityResultContracts.StartActivityForResult()
     ) { result: ActivityResult ->
         if (result.resultCode == RESULT_OK) {
@@ -153,11 +150,7 @@ class ChatActivity : AppCompatActivity() {
 
         binding.btnSendFile.setOnClickListener {
             val bottomChooseFileFragment = BottomChooseFileFragment(object: BottomChooseFileFragment.Callback{
-                override fun onFile() {
-                    TODO("Not yet implemented")
-                }
-
-                override fun onFoto() {
+                override fun onCamera() {
                     val permissionCheck = ContextCompat.checkSelfPermission(applicationContext, Manifest.permission.WRITE_EXTERNAL_STORAGE)
                     val checkCameraPermission = ContextCompat.checkSelfPermission(this@ChatActivity, Manifest.permission.CAMERA)
                     val permissionRead = ContextCompat.checkSelfPermission(this@ChatActivity, Manifest.permission.READ_EXTERNAL_STORAGE)
@@ -180,17 +173,34 @@ class ChatActivity : AppCompatActivity() {
                             ), SOLICITAR_PERMISSAO
                         )
                     } else {
-                        val builder = AlertDialog.Builder(this@ChatActivity)
-                        builder.setTitle("Foto")
-                        builder.setMessage("Como deseja selecionar a foto")
-                        builder.setPositiveButton("Tirar foto"){
-                                dialog, which -> tirarFoto()
-                        }
-                        builder.setNegativeButton("Galeria"){
-                                dialog, which -> buscarGaleria()
-                        }
+                        tirarFoto()
+                    }
+                }
 
-                        builder.show()
+                override fun onGaleria() {
+                    val permissionCheck = ContextCompat.checkSelfPermission(applicationContext, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    val checkCameraPermission = ContextCompat.checkSelfPermission(this@ChatActivity, Manifest.permission.CAMERA)
+                    val permissionRead = ContextCompat.checkSelfPermission(this@ChatActivity, Manifest.permission.READ_EXTERNAL_STORAGE)
+                    if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(
+                            this@ChatActivity, arrayOf(
+                                Manifest.permission.WRITE_EXTERNAL_STORAGE
+                            ), SOLICITAR_PERMISSAO
+                        )
+                    } else if (checkCameraPermission != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(
+                            this@ChatActivity, arrayOf(
+                                Manifest.permission.CAMERA
+                            ), SOLICITAR_PERMISSAO
+                        )
+                    } else if (permissionRead != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(
+                            this@ChatActivity, arrayOf(
+                                Manifest.permission.READ_EXTERNAL_STORAGE
+                            ), SOLICITAR_PERMISSAO
+                        )
+                    } else {
+                        buscarGaleria()
                     }
                 }
 
@@ -225,6 +235,6 @@ class ChatActivity : AppCompatActivity() {
         val intent = Intent()
         intent.setType("image/*")
         intent.action = Intent.ACTION_GET_CONTENT
-        launchSomeActivity.launch(intent)
+        launchGaleriaFoto.launch(intent)
     }
 }
