@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
 import com.example.chatandroid.R
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.button.MaterialButton
@@ -32,8 +33,8 @@ class BottomChooseFileFragment(callback: Callback) : BottomSheetDialogFragment()
         super.onCreateView(inflater, container, savedInstanceState)
         val view: View = inflater.inflate(R.layout.bottom_choose_file, container, false)
 
-        val btnCamera: MaterialButton = view.findViewById(R.id.btnCamera)
-        val btnGaleria: MaterialButton = view.findViewById(R.id.btnGaleria)
+        val btnCamera: LinearLayout = view.findViewById(R.id.btnCamera)
+        val btnGaleria: LinearLayout = view.findViewById(R.id.btnGaleria)
 
 
         btnCamera.setOnClickListener {

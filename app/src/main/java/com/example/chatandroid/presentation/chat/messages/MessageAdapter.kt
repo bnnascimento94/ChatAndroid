@@ -62,7 +62,8 @@ class MessageAdapter(private val context:Context): RecyclerView.Adapter<Recycler
             val viewHolder = holder as SentViewHolder
             viewHolder.sentMessage.setText(currentMessage.message)
             viewHolder.sentMessage.isFocusableInTouchMode = false
-            currentMessage.time?.let {
+            if(currentMessage.time != null){
+                viewHolder.time.visibility = View.VISIBLE
                 viewHolder.time.text = currentMessage.dataTexto
             }
 
@@ -79,7 +80,8 @@ class MessageAdapter(private val context:Context): RecyclerView.Adapter<Recycler
                     .into(viewHolder.imageView);
             }
 
-            currentMessage.time?.let {
+            if(currentMessage.time != null){
+                viewHolder.time.visibility = View.VISIBLE
                 viewHolder.time.text = currentMessage.dataTexto
             }
 
@@ -103,7 +105,8 @@ class MessageAdapter(private val context:Context): RecyclerView.Adapter<Recycler
                     .into(holder.imageView);
             }
 
-            currentMessage.time?.let {
+            if(currentMessage.time != null){
+                viewHolder.time.visibility = View.VISIBLE
                 viewHolder.time.text = currentMessage.dataTexto
             }
 
@@ -125,7 +128,7 @@ class MessageAdapter(private val context:Context): RecyclerView.Adapter<Recycler
             viewHolder.receivedMessage.isFocusable = false
             viewHolder.receivedMessage.isFocusableInTouchMode = false
 
-            currentMessage.time?.let {
+            if(currentMessage.time != null){
                 viewHolder.time.text = currentMessage.dataTexto
             }
         }

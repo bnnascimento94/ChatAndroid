@@ -15,6 +15,7 @@ import com.example.chatandroid.presentation.chat.messages.ChatActivityViewModelF
 import com.example.chatandroid.presentation.login.LoginViewModelFactory
 import com.example.chatandroid.presentation.login.SignUpViewModelFactory
 import com.example.chatandroid.presentation.profile.ProfileViewModelFactory
+import com.example.chatandroid.presentation.splash.SplashViewModelFactory
 import com.example.chatandroid.presentation.users.MainActivityViewModelFactory
 import dagger.Module
 import dagger.Provides
@@ -47,9 +48,18 @@ class FactoryModule {
     @Singleton
     @Provides
     fun loginViewModelFactory(
-        loginUsercase: LoginUsercase
+        loginUsercase: LoginUsercase,
+        currentUserUseCase: GetCurrentUserUseCase
     ): LoginViewModelFactory {
         return LoginViewModelFactory(loginUsercase)
+    }
+
+    @Singleton
+    @Provides
+    fun splashViewModelFactory(
+        currentUserUseCase: GetCurrentUserUseCase
+    ): SplashViewModelFactory {
+        return SplashViewModelFactory(currentUserUseCase)
     }
 
     @Singleton

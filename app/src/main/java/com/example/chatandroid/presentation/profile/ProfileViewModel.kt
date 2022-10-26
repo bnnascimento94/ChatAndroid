@@ -24,12 +24,12 @@ class ProfileViewModel(private val updateUserUseCase: UpdateUserUseCase,
     val getUser: LiveData<Resource<User>> = _getUser
 
     fun updateUser(nome:String, photo: Bitmap) = viewModelScope.launch {
-        Resource.Loading(true)
+        _updateUser.postValue(Resource.Loading())
         _updateUser.postValue(updateUserUseCase.execute(nome,photo))
     }
 
     fun getUser() = viewModelScope.launch {
-        Resource.Loading(true)
+        _getUser.postValue(Resource.Loading())
         _getUser.postValue(getCurrentUserUseCase.execute())
     }
 

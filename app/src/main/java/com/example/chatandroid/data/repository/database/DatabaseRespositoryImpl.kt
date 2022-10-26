@@ -184,13 +184,12 @@ class DatabaseRespositoryImpl(val mDbRef: DatabaseReference, val firebaseAuth: F
                 val messagesNotRead = senderChat.unreadMessages!! + 1
                 val value = mutableMapOf<String, Any?>()
                 value.put("unreadMessages",messagesNotRead)
-              //  mDbRef.child("chats").child(senderRoom!!).updateChildren(value).await()
+                mDbRef.child("chats").child(senderRoom!!).updateChildren(value).await()
             }else{
                 val value = mutableMapOf<String, Any?>()
                 value.put("unreadMessages",0)
-               // mDbRef.child("chats").child(senderRoom!!).setValue(value).await()
+                mDbRef.child("chats").child(senderRoom!!).updateChildren(value).await()
             }
-
 
 
             Resource.Success(true)
@@ -217,7 +216,7 @@ class DatabaseRespositoryImpl(val mDbRef: DatabaseReference, val firebaseAuth: F
             mDbRef.child("chats").child(senderRoom).child("messages").push().setValue(messageObject).await()
             mDbRef.child("chats").child(receiverRoom).child("messages").push().setValue(messageObject).await()
 
-            /**
+
             val senderChat = mDbRef.child("chats").child(senderRoom).get().await().getValue(Chat::class.java)
             if(senderChat!!.unreadMessages != null){
                 val messagesNotRead = senderChat.unreadMessages!! + 1
@@ -227,8 +226,8 @@ class DatabaseRespositoryImpl(val mDbRef: DatabaseReference, val firebaseAuth: F
             }else{
                 val value = mutableMapOf<String, Any?>()
                 value.put("unreadMessages",0)
-                mDbRef.child("chats").child(senderRoom!!).setValue(value).await()
-            } **/
+                mDbRef.child("chats").child(senderRoom!!).updateChildren(value).await()
+            }
 
 
 
@@ -283,9 +282,9 @@ class DatabaseRespositoryImpl(val mDbRef: DatabaseReference, val firebaseAuth: F
             userReceiver.photoName = searchFotoUrl(userReceiver.photoName!!)
         }
 
-        //val value = mutableMapOf<String, Any?>()
-       // value.put("unreadMessages",0)
-       // mDbRef.child("chats").child(receiverRoom!!).updateChildren(value).await()
+        val value = mutableMapOf<String, Any?>()
+        value.put("unreadMessages",0)
+        mDbRef.child("chats").child(receiverRoom!!).updateChildren(value).await()
 
         // 3.- We generate a subscription that is going to let us listen for changes with
         // .addSnapshotListener and then offer those values to the channel that will be collected in our viewmodel

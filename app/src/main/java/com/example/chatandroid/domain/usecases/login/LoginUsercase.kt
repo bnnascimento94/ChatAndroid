@@ -9,7 +9,8 @@ import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.messaging.FirebaseMessaging
 import kotlinx.coroutines.tasks.await
 
-class LoginUsercase(private val loginRepository: LoginRepository, private val databaseRepository: DatabaseRepository) {
+class LoginUsercase(private val loginRepository: LoginRepository,
+                    private val databaseRepository: DatabaseRepository) {
     suspend fun execute(userName:String,password:String): Resource<Boolean>?{
         return try {
             val result = loginRepository.getLogin(userName,password)

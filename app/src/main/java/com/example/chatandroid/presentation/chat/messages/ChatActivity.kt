@@ -214,6 +214,13 @@ class ChatActivity : AppCompatActivity() {
 
     }
 
+
+    override fun onDestroy() {
+        super.onDestroy()
+        adapter.load(ArrayList<Message>(),"")
+    }
+
+
     private fun tirarFoto(){
         val intent = Intent()
         intent.action = MediaStore.ACTION_IMAGE_CAPTURE

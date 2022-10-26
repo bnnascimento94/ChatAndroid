@@ -97,6 +97,8 @@ class LoginActivity : AppCompatActivity() {
             startActivity(intent)
         }
 
+
+
         loginViewModel.loginUser.observe(this, Observer { resource ->
             when(resource){
                 is Resource.Loading ->{

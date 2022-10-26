@@ -37,31 +37,75 @@
 
 
     <LinearLayout
-        android:orientation="horizontal"
+        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-
-
-        <com.google.android.material.button.MaterialButton
+        <LinearLayout
             android:id="@+id/btnCamera"
-            android:layout_weight="1"
-            android:backgroundTint="@android:color/transparent"
-            android:textColor="@color/black"
+            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:text="Camera"/>
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:layout_weight="1"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_margin="10dp"
+                android:src="@drawable/ic_baseline_photo_camera_24"/>
 
 
-        <com.google.android.material.button.MaterialButton
+
+            <TextView
+                android:layout_weight="5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="Câmera"
+                android:textColor="@color/black"
+                android:textSize="20sp"/>
+
+
+
+
+        </LinearLayout>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@android:color/darker_gray"/>
+        <LinearLayout
             android:id="@+id/btnGaleria"
-            android:layout_weight="1"
-            android:backgroundTint="@android:color/transparent"
-            android:textColor="@color/black"
+            android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="10dp"
-            android:text="Galeria"/>
+            android:layout_height="wrap_content">
+
+            <ImageView
+                android:layout_weight="1"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_margin="10dp"
+                android:src="@drawable/ic_baseline_photo_24"/>
+
+
+
+            <TextView
+                android:layout_weight="5"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:text="Galeria"
+                android:textColor="@color/black"
+                android:textSize="20sp"/>
+
+
+
+        </LinearLayout>
+
+
+
+
+
+
+
 
     </LinearLayout>
 

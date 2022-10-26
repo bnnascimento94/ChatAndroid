@@ -45,8 +45,8 @@ class MainActivity : AppCompatActivity() {
         mainActivityViewModel = ViewModelProvider(this,factory).get(MainActivityViewModel::class.java)
         mainActivityViewModel.getUsers()
 
-        val toolbar: Toolbar = findViewById(R.id.toolbar)
-        setSupportActionBar(toolbar)
+
+        setSupportActionBar(binding.toolbar)
         supportActionBar?.title = "Contatos"
 
 

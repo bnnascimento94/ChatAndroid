@@ -7,5 +7,4 @@ import com.example.chatandroid.domain.repository.LoginRepository
 
 class GetCurrentUserUseCase(private val databaseRepository: DatabaseRepository) {
     suspend fun execute(): Resource<User>? = databaseRepository.getUserConected()
-
 }

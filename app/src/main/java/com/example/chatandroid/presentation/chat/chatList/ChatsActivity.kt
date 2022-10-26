@@ -22,6 +22,7 @@ import com.example.chatandroid.databinding.ActivityChatsBinding
 import com.example.chatandroid.presentation.login.LoginActivity
 import com.example.chatandroid.presentation.profile.ProfileActivity
 import com.example.chatandroid.presentation.users.MainActivity
+import com.google.android.material.appbar.MaterialToolbar
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -48,8 +49,8 @@ class ChatsActivity : AppCompatActivity() {
         chatViewModel = ViewModelProvider(this,factory).get(ChatsViewModel::class.java)
         chatViewModel.getChatsList()
 
-        val toolbar: Toolbar = findViewById(R.id.toolbar)
-        setSupportActionBar(toolbar)
+
+        setSupportActionBar(binding.toolbar)
         supportActionBar?.title = "Conversas"
 
 
@@ -93,6 +94,11 @@ class ChatsActivity : AppCompatActivity() {
         })
 
 
+    }
+
+    override fun onResume() {
+        super.onResume()
+        chatViewModel.getChatsList()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

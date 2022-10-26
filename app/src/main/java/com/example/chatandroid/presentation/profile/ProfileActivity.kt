@@ -14,6 +14,7 @@ import android.widget.Toast
 import androidx.activity.result.ActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
@@ -87,9 +88,14 @@ class ProfileActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         binding = DataBindingUtil.setContentView(this, R.layout.activity_profile)
         profileViewModel = ViewModelProvider(this,factory).get(ProfileViewModel::class.java)
         profileViewModel.getUser()
+
+
+        setSupportActionBar(binding.toolbar)
+        supportActionBar?.title = "Perfil"
 
 
         profileViewModel.getUser.observe(this, Observer { resource ->
