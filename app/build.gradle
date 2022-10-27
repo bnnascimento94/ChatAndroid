@@ -9,6 +9,10 @@ plugins {
 android {
     compileSdk 33
 
+    packagingOptions{
+        exclude 'META-INF/DEPENDENCIES'
+    }
+
     defaultConfig {
         applicationId "com.example.chatandroid"
         minSdk 21
@@ -81,6 +85,12 @@ dependencies {
     kapt 'com.github.bumptech.glide:compiler:4.12.0'
 
     implementation 'de.hdodenhof:circleimageview:3.1.0'
+
+    //retrofit
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.5.0'
+
+    implementation 'com.google.auth:google-auth-library-oauth2-http:1.3.0'
 }
 
 apply plugin: 'com.google.gms.google-services'

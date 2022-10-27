@@ -1,9 +1,12 @@
 package com.example.chatandroid.presentation.di.core
 
+import com.example.chatandroid.data.remote.RemoteAPI
 import com.example.chatandroid.data.repository.database.DatabaseRespositoryImpl
 import com.example.chatandroid.data.repository.login.LoginRepositoryImpl
+import com.example.chatandroid.data.repository.notification.NotificationRepositoryImpl
 import com.example.chatandroid.domain.repository.DatabaseRepository
 import com.example.chatandroid.domain.repository.LoginRepository
+import com.example.chatandroid.domain.repository.NotificacaoRepository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.storage.FirebaseStorage
@@ -27,6 +30,12 @@ class RepositoryModule {
     @Provides
     fun provideFirebaseDatabaseRepository(mDbRef: DatabaseReference, firebaseAuth: FirebaseAuth, firebaseStorage: FirebaseStorage): DatabaseRepository {
         return DatabaseRespositoryImpl(mDbRef,firebaseAuth,firebaseStorage)
+    }
+
+    @Singleton
+    @Provides
+    fun provideNotificacaoRepository(remoteAPI: RemoteAPI): NotificacaoRepository {
+        return NotificationRepositoryImpl(remoteAPI)
     }
 
 
